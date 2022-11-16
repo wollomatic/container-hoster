@@ -20,9 +20,8 @@ Since container-hoster is intended to be used in a Docker container, it is confi
 
 ## License
 
-This project is licensed under the [CC0 1.0 Universal](LICENSE.md)
-Creative Commons License - see the [LICENSE.md](LICENSE.md) file for
-details
+This project is licensed under the [MIT license](LICENSE.md)
+Creative Commons License - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 Thanks to [David Darias](https://github.com/dvddarias) for the original idea [docker-hoster](https://github.com/dvddarias/docker-hoster).
