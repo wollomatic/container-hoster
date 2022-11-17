@@ -17,6 +17,7 @@ Since container-hoster is intended to be used in a Docker container, it is confi
 
 ``CH_NETWORK_REGEXP``: A regular expression to match the network name of the container. Only containers with a matching network name will be added to the hosts file. Defaults to ``.*``.
 
+``CH_LOG_EVENTS``: It set to true, all docker events which lead to rewrite the hosts file will be logged to stdout. Defaults to ``false``
 
 ## License
 
