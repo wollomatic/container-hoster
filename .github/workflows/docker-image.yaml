@@ -1,0 +1,40 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch:
+  # run it on push to the default repository branch
+  # push:
+  #   branches: [main]
+  # # run it during pull request
+  # pull_request:
+  # schedule:
+  #   - cron:  '14 3 * * 0'
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Set image name
+      run: |
+        echo "IMAGE_NAME=docker.io/wollomatic/container-hoster:0.0.1" >> $GITHUB_ENV
+    - name: Compile and build the Docker image
+      run: |
+        docker build . --tag ${{ env.IMAGE_NAME }}
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: '${{ env.IMAGE_NAME }}'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+    - name: Push to Docker hub
+      run: |
+        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin docker.io
+        docker push ${{ env.IMAGE_NAME }}
