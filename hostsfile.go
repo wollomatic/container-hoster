@@ -28,11 +28,11 @@ func refreshHostsfile(cli *client.Client) error {
 	if len(containers) > 0 {
 		for _, container := range containers {
 			if conf.onlyLabeledContainers && !(strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) == "true") {
-				log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
+				// log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
 				continue
 			}
 			if strings.ToLower(container.Labels[DOCKER_LABEL+".exclude"]) == "true" {
-				log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
+				// log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
 				continue
 			}
 			containerHostList := getContainerHostList(container)
