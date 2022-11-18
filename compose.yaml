@@ -7,16 +7,16 @@ services:
     restart: unless-stopped
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./hosts:/hosts
+      - /etc/hosts:/hosts
     network_mode: none
     # environment:
-      # - CH_HOSTSFILE=./hosts
-      # - CH_INTERVAL=10s
-      # - CH_HOSTNAME_FROM_CONTAINERNAME=true
-      # - CH_HOSTNAME_FROM_LABEL=false
-      # - CH_ONLY_LABELED_CONTAINERS=true
-      # - CH_NETWORK_REGEXP=.*
-      # - CH_LOG_EVENTS=false
+    #   - CH_HOSTSFILE=./hosts
+    #   - CH_INTERVAL=10s
+    #   - CH_HOSTNAME_FROM_CONTAINERNAME=true
+    #   - CH_HOSTNAME_FROM_LABEL=false
+    #   - CH_ONLY_LABELED_CONTAINERS=true
+    #   - CH_NETWORK_REGEXP=.*
+    #   - CH_LOG_EVENTS=false
     # labels:
-      # de.wollomatic.container-hoster.name: "my-container"
-      # de.wollomatic.container-hoster.enabled: "TRUE"
+    #   de.wollomatic.container-hoster.name: "my-container"
+    #   de.wollomatic.container-hoster.enabled: "true"
