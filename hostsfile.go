@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
@@ -26,14 +27,18 @@ func refreshHostsfile(cli *client.Client) error {
 
 	if len(containers) > 0 {
 		for _, container := range containers {
-			if conf.onlyLabeledContainers && (strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) == "true") {
+			if conf.onlyLabeledContainers && !(strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) == "true") {
+				log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
 				continue
 			}
-
+			if strings.ToLower(container.Labels[DOCKER_LABEL+".exclude"]) == "true" {
+				log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
+				continue
+			}
 			containerHostList := getContainerHostList(container)
 			if containerHostList != "" {
 				for networkName, networkInfo := range container.NetworkSettings.Networks {
-					if networkRegexpCompiled.MatchString(networkName) {
+					if networkRegexpCompiled.MatchString(networkName) && networkInfo.IPAddress != "" {
 						dockerHosts = append(dockerHosts, []byte(fmt.Sprintf("%-15s %-60s # %s\n", networkInfo.IPAddress, containerHostList, networkName))...)
 					}
 				}
@@ -66,10 +71,10 @@ func getContainerHostList(container types.Container) string {
 	if conf.hostnameFromContainername {
 		s = strings.TrimPrefix(container.Names[len(container.Names)-1], "/") + "  "
 	}
-	
+
 	if label, ok := container.Labels[DOCKER_LABEL+".name"]; ok && conf.hostnameFromLabel {
 		s = s + label
 	}
-	
+
 	return strings.Trim(s, " ")
 }
