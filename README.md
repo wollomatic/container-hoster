@@ -4,7 +4,7 @@ A simple "etc/hosts" file injection tool to resolve names of local Docker contai
 
 ## Installation
 
-The docker image is available on [Docker Hub](https://hub.docker.com/r/wollomatic/container-hoster/). A sample docker-compose.yml file is provided in the repository. 
+The docker image is available on [Docker Hub](https://hub.docker.com/r/wollomatic/container-hoster/). A sample [docker-compose.yml](https://raw.githubusercontent.com/wollomatic/container-hoster/main/compose.yaml) file is provided in the [repository](https://github.com/wollomatic/container-hoster).
 
 ## Configuration
 Container hoster is configured via environment variables. If no env variable is set, container-hoster will use the default value. The following variables are available:
