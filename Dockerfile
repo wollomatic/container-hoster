@@ -1,4 +1,4 @@
-FROM golang:1.19-bullseye AS build
+FROM --platform=$BUILDPLATFORM golang:1.19-alpine AS build
 
 WORKDIR /app
 
@@ -6,8 +6,8 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY *.go ./
-
-RUN GOOS=linux GOARCH=amd64 go build --tags netgo -ldflags="-w -s" -o /container-hoster .
+ARG TARGETOS TARGETARCH
+RUN  GOOS=$TARGETOS GOARCH=$TARGETARCH go build --tags netgo -ldflags="-w -s" -o /container-hoster .
 
 
 FROM scratch
