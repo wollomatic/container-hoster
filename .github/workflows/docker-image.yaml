@@ -40,4 +40,4 @@ jobs:
     - name: Push to Docker hub
       run: |
         echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin docker.io
-        docker push --all-tags ${{ env.IMAGE_NAME }}:${{ env.IMAGE_VERSION }}
+        docker push --all-tags ${{ env.IMAGE_NAME }}
