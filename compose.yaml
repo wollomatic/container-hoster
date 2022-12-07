@@ -1,7 +1,7 @@
 ---
 services:
   container-hoster:
-    image: wollomatic/container-hoster:0.0.1
+    image: wollomatic/container-hoster:0.0.3
     read_only: true
     mem_limit: 100M
     restart: unless-stopped
