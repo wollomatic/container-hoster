@@ -1,3 +1,4 @@
+ARG BUILDPLATFORM
 FROM --platform=$BUILDPLATFORM golang:1.20.5-alpine AS build
 
 WORKDIR /app
@@ -6,9 +7,9 @@ COPY go.mod go.sum ./
 RUN go mod download && go mod verify
 
 COPY *.go ./
-ARG TARGETOS TARGETARCH
+ARG TARGETOS
+ARG TARGETARCH
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build --tags netgo -ldflags="-w -s" -o /container-hoster .
-
 
 FROM scratch
 
