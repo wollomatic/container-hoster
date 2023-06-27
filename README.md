@@ -41,8 +41,8 @@ The build container image is made from scratch and contains no additional softwa
 Container-hoster does not need to have access to any network.
 
 ## License
-This project is licensed under the [MIT license](LICENSE.md)
-Creative Commons License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the [MIT license](LICENSE)
+ - see the [LICENSE](LICENSE) file for details
 
 ## Acknowledgments
 Thanks to [David Darias](https://github.com/dvddarias) for the original idea [docker-hoster](https://github.com/dvddarias/docker-hoster).
