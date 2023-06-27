@@ -57,7 +57,7 @@ func main() {
 
 	// create background job for refreshing the hosts file
 	fch := make(chan error)
-	go refreshHostsfileJob(fch, conf.hostsfile, cli)
+	go refreshHostsfileJob(fch, cli)
 
 	// create listener for docker events
 	ch, ech := cli.Events(context.Background(), types.EventsOptions{})
@@ -89,7 +89,7 @@ func main() {
 }
 
 // refreshHostsfileJob is a background job for refreshing the hosts file
-func refreshHostsfileJob(ech chan<- error, hostsfile string, cli *client.Client) {
+func refreshHostsfileJob(ech chan<- error, cli *client.Client) {
 	for {
 		if refreshHostsfileNeeded {
 			refreshHostsfileNeeded = false
