@@ -47,7 +47,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer cli.Close()
+	defer func(cli *client.Client) {
+		err := cli.Close()
+		if err != nil {
+			log.Println("Error closing docker client:", err)
+		}
+	}(cli)
 
 	// check if docker is running
 	_, err = cli.Ping(context.Background())
