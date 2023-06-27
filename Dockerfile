@@ -1,4 +1,3 @@
-ARG BUILDPLATFORM
 FROM --platform=$BUILDPLATFORM golang:1.20.5-alpine AS build
 
 WORKDIR /app
