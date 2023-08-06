@@ -17,7 +17,7 @@ import (
 const (
 	PROGRAM_NAME = "container-hoster"
 	PROGRAM_URL  = "github.com/wollomatic/container-hoster"
-	VERSION      = "0.0.11"
+	VERSION      = "0.0.12"
 )
 
 var (
