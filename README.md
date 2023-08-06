@@ -9,7 +9,7 @@ The docker image is available on [Docker Hub](https://hub.docker.com/r/wollomati
 ## Configuration
 Container hoster is configured via environment variables. If no env variable is set, container-hoster will use the default value. The following variables are available:
 
-* ``CH_HOSTSFILE``: The path to the hosts file to be injected. Defaults to ``/hosts``. The real hostfile should be mounted as a bind mount to this path.
+* ``CH_HOSTSFILE``: The path to the hosts file to be injected. Defaults to ``/hosts``. The real hostsfile should be mounted as a bind mount to this path.
 
 * ``CH_INTERVAL``: The interval in seconds to check if an update for the hostsfile is needed. It is formatted as a Go duration string. A duration string is a possibly signed sequence of decimal numbers, each with optional fraction and a unit suffix, such as "300ms", "-1.5h" or "2h45m". Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h". Defaults to ``10s``.
 
