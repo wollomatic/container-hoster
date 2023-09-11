@@ -2,7 +2,7 @@ module github.com/wollomatic/container-hoster
 
 go 1.19
 
-require github.com/docker/docker v24.0.5+incompatible
+require github.com/docker/docker v24.0.6+incompatible
 
 require (
 	github.com/Microsoft/go-winio v0.6.1 // indirect
