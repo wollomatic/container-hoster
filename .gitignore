@@ -20,3 +20,5 @@ hosts
 
 # local build script
 build.sh
+
+.idea
