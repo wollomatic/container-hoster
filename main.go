@@ -73,7 +73,7 @@ func main() {
 		select {
 		case event := <-ch:
 			switch event.Action {
-			case "start", "stop", "die", "destroy":
+			case "start", "stop", "die", "destroy", "rename":
 				if conf.logEvents {
 					log.Println(event.Action, event.Actor.Attributes["name"])
 				}
