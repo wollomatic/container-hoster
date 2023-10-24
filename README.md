@@ -40,6 +40,9 @@ The build container image is made from scratch and contains no additional softwa
 
 Container-hoster does not need to have access to any network.
 
+## Changes
+ - 0.1.x: Renaming containers will now update the hosts file.
+
 ## License
 This project is licensed under the [MIT license](LICENSE)
  - see the [LICENSE](LICENSE) file for details
