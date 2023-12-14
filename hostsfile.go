@@ -26,7 +26,7 @@ func refreshHostsfile(cli *client.Client) error {
 
 	if len(containers) > 0 {
 		for _, container := range containers {
-			if conf.onlyLabeledContainers && !(strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) == "true") {
+			if conf.onlyLabeledContainers && (strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) != "true") {
 				// log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
 				continue
 			}
@@ -60,7 +60,7 @@ func writeHostsfile(bs []byte) error {
 	hfnew := bytes.Split(hf, []byte(HOSTLIST_PREFIX))[0]
 	hfnew = append(hfnew, bs...)
 
-	return os.WriteFile(conf.hostsfile, hfnew, 0644)
+	return os.WriteFile(conf.hostsfile, hfnew, 0644) // #nosec G306 -- hostsfile has to be writable
 }
 
 // getContainerHostList returns the list of hostnames for a given container

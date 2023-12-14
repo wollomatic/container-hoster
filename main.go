@@ -36,7 +36,7 @@ func main() {
 	// check if hostsfile is writable
 	if _, err := os.OpenFile(conf.hostsfile, os.O_WRONLY, 0644); err != nil {
 		log.Fatalf("Error: Hostsfile %s ist not writable: %s", conf.hostsfile, err)
-	}
+	} // #nosec G302 -- hostsfile has to be writable
 
 	// stop signal listener
 	done := make(chan os.Signal, 1)
