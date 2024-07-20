@@ -8,7 +8,7 @@ RUN go mod download && go mod verify
 COPY *.go ./
 ARG TARGETOS
 ARG TARGETARCH
-RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build --tags netgo -ldflags="-w -s" -o /container-hoster .
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH go build --tags netgo -ldflags="-w -s -X 'main.version=${VERSION}'" -o /container-hoster .
 
 FROM scratch
 

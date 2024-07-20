@@ -1,43 +1,34 @@
 name: Build and Publish
 
 on:
-  workflow_dispatch:
-  # run it on push to the default repository branch
-  # push:
-  #   branches: [main]
-  # # run it during pull request
-  # pull_request:
-  # schedule:
-  #   - cron:  '14 3 * * 0'
+  push:
+    tags:
+      - *
+    branch:
+      - main
 
 jobs:
-
   build:
-
+    name: Build and Publish
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
-    - name: Set image name
-      run: |
-        echo "IMAGE_NAME=docker.io/wollomatic/container-hoster" >> $GITHUB_ENV
-        echo "IMAGE_VERSION=0.1.2" >> $GITHUB_ENV
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    - name: Compile and build the Docker image
-      run: |
-        docker buildx build . --load --platform=linux/amd64 --tag ${{ env.IMAGE_NAME }}
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+      uses: actions/checkout@v4
+
+    - name: Login to docker.io registry
+      uses: docker/login-action@v3
       with:
-        image-ref: '${{ env.IMAGE_NAME }}'
-        format: 'table'
-        exit-code: '1'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'CRITICAL,HIGH,MEDIUM'
-    - name: Build all platforms and push to Docker hub
-      run: |
-        echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin docker.io
-        docker buildx build . --platform=linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/riscv64,linux/s390x,linux/ppc64le --tag ${{ env.IMAGE_NAME }}:${{ env.IMAGE_VERSION }} --tag ${{ env.IMAGE_NAME }}:latest --push
+        username: ${{ secrets.DOCKERHUB_USER }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Build image and push to Docker Hub
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/riscv64,linux/s390x,linux/ppc64le
+        push: true
+        build-args: VERSION=${{github.ref_name}}
+        tags: |
+          wollomatic/container-hoster:latest 
+          wollomatic/container-hoster:${{github.ref_name}}

@@ -17,26 +17,27 @@ import (
 const (
 	PROGRAM_NAME = "container-hoster"
 	PROGRAM_URL  = "github.com/wollomatic/container-hoster"
-	VERSION      = "0.1.2"
 )
 
 var (
 	refreshHostsfileNeeded bool = true
 	networkRegexpCompiled  *regexp.Regexp
+	version                = "develop" // will be set in Github Action
 )
 
 func main() {
 
-	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", PROGRAM_NAME, VERSION, runtime.GOOS, runtime.GOARCH, runtime.Version(), PROGRAM_URL)
+	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", PROGRAM_NAME, version, runtime.GOOS, runtime.GOARCH, runtime.Version(), PROGRAM_URL)
 
 	conf.getFromENV()
 	conf.logConfig()
 	networkRegexpCompiled = regexp.MustCompile(conf.networkRegexp)
 
 	// check if hostsfile is writable
-	if _, err := os.OpenFile(conf.hostsfile, os.O_WRONLY, 0644); err != nil {
+	_, err := os.OpenFile(conf.hostsfile, os.O_WRONLY, 0644) // #nosec G302 -- hostsfile needs 644 permissions
+	if err != nil {
 		log.Fatalf("Error: Hostsfile %s ist not writable: %s", conf.hostsfile, err)
-	} // #nosec G302 -- hostsfile has to be writable
+	}
 
 	// stop signal listener
 	done := make(chan os.Signal, 1)
