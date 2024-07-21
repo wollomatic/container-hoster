@@ -86,8 +86,8 @@ func main() {
 		case err := <-fch:
 			log.Println("Docker event Error:", err)
 			gracefulShutdown(2)
-		case signal := <-done: // graceful shutdown
-			log.Println("Received stop signal: ", signal)
+		case sig := <-done: // graceful shutdown
+			log.Println("Received stop signal: ", sig)
 			gracefulShutdown(0)
 		}
 	}
