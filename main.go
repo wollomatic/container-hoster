@@ -15,19 +15,19 @@ import (
 )
 
 const (
-	PROGRAM_NAME = "container-hoster"
-	PROGRAM_URL  = "github.com/wollomatic/container-hoster"
+	programName = "container-hoster"
+	programURL  = "github.com/wollomatic/container-hoster"
 )
 
 var (
-	refreshHostsfileNeeded bool = true
+	refreshHostsfileNeeded = true
 	networkRegexpCompiled  *regexp.Regexp
 	version                = "develop" // will be set in Github Action
 )
 
 func main() {
 
-	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", PROGRAM_NAME, version, runtime.GOOS, runtime.GOARCH, runtime.Version(), PROGRAM_URL)
+	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", programName, version, runtime.GOOS, runtime.GOARCH, runtime.Version(), programURL)
 
 	conf.getFromENV()
 	conf.logConfig()

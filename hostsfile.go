@@ -14,7 +14,7 @@ import (
 // refreshHostsfile reads the docker containers, creates the container list and starts writeHostsfile() to write the hosts file
 func refreshHostsfile(cli *client.Client) error {
 
-	dockerHosts := []byte{}
+	var dockerHosts []byte
 
 	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
 	if err != nil {
