@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/docker/docker/api/types/container"
 	"os"
 	"strings"
 
@@ -16,7 +17,7 @@ func refreshHostsfile(cli *client.Client) error {
 
 	var dockerHosts []byte
 
-	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	containers, err := cli.ContainerList(context.Background(), container.ListOptions{})
 	if err != nil {
 		return err
 	}
@@ -25,18 +26,18 @@ func refreshHostsfile(cli *client.Client) error {
 	dockerHosts = append(dockerHosts, []byte(HOSTLIST_INFO)...)
 
 	if len(containers) > 0 {
-		for _, container := range containers {
-			if conf.onlyLabeledContainers && (strings.ToLower(container.Labels[DOCKER_LABEL+".enabled"]) != "true") {
-				// log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
+		for _, c := range containers {
+			if conf.onlyLabeledContainers && (strings.ToLower(c.Labels[DOCKER_LABEL+".enabled"]) != "true") {
+				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
 				continue
 			}
-			if strings.ToLower(container.Labels[DOCKER_LABEL+".exclude"]) == "true" {
-				// log.Println("Skipping container", container.Names[len(container.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
+			if strings.ToLower(c.Labels[DOCKER_LABEL+".exclude"]) == "true" {
+				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
 				continue
 			}
-			containerHostList := getContainerHostList(container)
+			containerHostList := getContainerHostList(c)
 			if containerHostList != "" {
-				for networkName, networkInfo := range container.NetworkSettings.Networks {
+				for networkName, networkInfo := range c.NetworkSettings.Networks {
 					if networkRegexpCompiled.MatchString(networkName) && networkInfo.IPAddress != "" {
 						dockerHosts = append(dockerHosts, []byte(fmt.Sprintf("%-15s %-60s # %s\n", networkInfo.IPAddress, containerHostList, networkName))...)
 					}
