@@ -1,6 +1,6 @@
 module github.com/wollomatic/container-hoster
 
-go 1.22.5
+go 1.22.6
 
 require github.com/docker/docker v24.0.9+incompatible
 

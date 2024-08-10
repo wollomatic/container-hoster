@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.22.5-alpine3.20 AS build
+FROM --platform=$BUILDPLATFORM golang:1.22.6-alpine3.20 AS build
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download && go mod verify
