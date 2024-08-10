@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/docker/docker/api/types/events"
 	"log"
 	"os"
 	"os/signal"
@@ -10,7 +11,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
 
@@ -66,7 +66,7 @@ func main() {
 	go refreshHostsfileJob(fch, cli)
 
 	// create listener for docker events
-	ch, ech := cli.Events(context.Background(), types.EventsOptions{})
+	ch, ech := cli.Events(context.Background(), events.ListOptions{})
 
 	log.Println("everything seems okay, waiting for things to happen")
 	// wait for things to happen
