@@ -10,27 +10,41 @@ jobs:
   build:
     name: Build and Publish
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to docker.io registry
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USER }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Login to docker.io registry
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    - name: Build image and push to Docker Hub
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/riscv64,linux/s390x,linux/ppc64le
-        push: true
-        build-args: VERSION=${{github.ref_name}}
-        tags: |
-          wollomatic/container-hoster:latest 
-          wollomatic/container-hoster:${{github.ref_name}}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build image and push to Docker Hub and GHCR
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64,linux/386,linux/arm64,linux/arm/v7,linux/riscv64,linux/s390x,linux/ppc64le
+          push: true
+          build-args: VERSION=${{github.ref_name}}
+          tags: |
+            wollomatic/container-hoster:latest 
+            wollomatic/container-hoster:${{github.ref_name}}
+            ghcr.io/wollomatic/container-hoster:latest 
+            ghcr.io/wollomatic/container-hoster:${{github.ref_name}}
