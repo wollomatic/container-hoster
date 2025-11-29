@@ -2,7 +2,7 @@ module github.com/wollomatic/container-hoster
 
 go 1.23.1
 
-require github.com/docker/docker v27.4.1+incompatible
+require github.com/docker/docker v28.0.0+incompatible
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
