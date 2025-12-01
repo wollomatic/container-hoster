@@ -36,7 +36,7 @@ Container labels are optional. The following labels are available:
 
 In most cases, the container-hoster container will be run as root. This is necessary to be able to write to the hosts file and connect to the docker socket. Giving access to the docker socket is potentially dangerous because a container that has full access to the docker socket could start and stop containers. Container-hoster will only listen to docker events and will not start or stop containers. It will only update the hosts file if a container is started or stopped.
 
-The build container image is made from scratch and contains no additional software (except the Docker SDK and it's dependencies).
+The build container image is made from scratch and contains no additional software (except the Docker SDK and its dependencies).
 
 Container-hoster does not need to have access to any network.
 
