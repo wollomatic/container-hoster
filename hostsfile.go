@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/docker/docker/api/types/container"
 	"os"
 	"strings"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+
 	"github.com/docker/docker/client"
 )
 
@@ -65,7 +65,7 @@ func writeHostsfile(bs []byte) error {
 }
 
 // getContainerHostList returns the list of hostnames for a given container
-func getContainerHostList(container types.Container) string {
+func getContainerHostList(container container.Summary) string {
 	var s string
 
 	if conf.hostnameFromContainername {
