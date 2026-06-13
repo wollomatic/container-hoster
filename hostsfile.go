@@ -7,47 +7,46 @@ import (
 	"os"
 	"strings"
 
-	"github.com/docker/docker/api/types/container"
-
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 )
 
-// refreshHostsfile reads the docker containers, creates the container list and starts writeHostsfile() to write the hosts file
+// refreshHostsfile reads the docker containers, creates the container list, and writes the hosts file.
 func refreshHostsfile(cli *client.Client) error {
 
-	var dockerHosts []byte
+	var engineHosts []byte
 
-	containers, err := cli.ContainerList(context.Background(), container.ListOptions{})
+	result, err := cli.ContainerList(context.Background(), client.ContainerListOptions{})
 	if err != nil {
 		return err
 	}
 
-	dockerHosts = append(dockerHosts, []byte(HOSTLIST_PREFIX)...)
-	dockerHosts = append(dockerHosts, []byte(HOSTLIST_INFO)...)
+	engineHosts = append(engineHosts, []byte(HOSTLIST_PREFIX)...)
+	engineHosts = append(engineHosts, []byte(HOSTLIST_INFO)...)
 
-	if len(containers) > 0 {
-		for _, c := range containers {
-			if conf.onlyLabeledContainers && (strings.ToLower(c.Labels[DOCKER_LABEL+".enabled"]) != "true") {
-				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is not labeled with", DOCKER_LABEL+".enabled=true")
+	if len(result.Items) > 0 {
+		for _, c := range result.Items {
+			if conf.onlyLabeledContainers && (strings.ToLower(c.Labels[CONTAINER_LABEL_PREFIX+".enabled"]) != "true") {
+				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is not labeled with", CONTAINER_LABEL_PREFIX+".enabled=true")
 				continue
 			}
-			if strings.ToLower(c.Labels[DOCKER_LABEL+".exclude"]) == "true" {
-				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is labeled with", DOCKER_LABEL+".exclude=true")
+			if strings.ToLower(c.Labels[CONTAINER_LABEL_PREFIX+".exclude"]) == "true" {
+				// log.Println("Skipping c", c.Names[len(c.Names)-1], "because it is labeled with", CONTAINER_LABEL_PREFIX+".exclude=true")
 				continue
 			}
 			containerHostList := getContainerHostList(c)
-			if containerHostList != "" {
+			if containerHostList != "" && c.NetworkSettings != nil {
 				for networkName, networkInfo := range c.NetworkSettings.Networks {
-					if networkRegexpCompiled.MatchString(networkName) && networkInfo.IPAddress != "" {
-						dockerHosts = append(dockerHosts, []byte(fmt.Sprintf("%-15s %-60s # %s\n", networkInfo.IPAddress, containerHostList, networkName))...)
+					if networkRegexpCompiled.MatchString(networkName) && networkInfo.IPAddress.IsValid() {
+						engineHosts = append(engineHosts, []byte(fmt.Sprintf("%-15s %-60s # %s\n", networkInfo.IPAddress.String(), containerHostList, networkName))...)
 					}
 				}
 			}
 		}
 	}
-	dockerHosts = append(dockerHosts, []byte(HOSTLIST_SUFFIX)...)
+	engineHosts = append(engineHosts, []byte(HOSTLIST_SUFFIX)...)
 
-	return writeHostsfile(dockerHosts)
+	return writeHostsfile(engineHosts)
 }
 
 // writeHostsfile reads the hosts file until the HOSTLIST_PREFIX and appends the given byte slice
@@ -72,7 +71,7 @@ func getContainerHostList(container container.Summary) string {
 		s = strings.TrimPrefix(container.Names[len(container.Names)-1], "/") + "  "
 	}
 
-	if label, ok := container.Labels[DOCKER_LABEL+".name"]; ok && conf.hostnameFromLabel {
+	if label, ok := container.Labels[CONTAINER_LABEL_PREFIX+".name"]; ok && conf.hostnameFromLabel {
 		s = s + label
 	}
 

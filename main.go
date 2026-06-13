@@ -2,16 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/docker/docker/api/types/events"
 	"log"
 	"os"
 	"os/signal"
 	"regexp"
 	"runtime"
+	"sync/atomic"
 	"syscall"
 	"time"
 
-	"github.com/docker/docker/client"
+	"github.com/moby/moby/client"
 )
 
 const (
@@ -20,12 +20,13 @@ const (
 )
 
 var (
-	refreshHostsfileNeeded = true
+	refreshHostsfileNeeded atomic.Bool
 	networkRegexpCompiled  *regexp.Regexp
 	version                = "develop" // will be set in Github Action
 )
 
 func main() {
+	refreshHostsfileNeeded.Store(true)
 
 	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", programName, version, runtime.GOOS, runtime.GOARCH, runtime.Version(), programURL)
 
@@ -43,8 +44,8 @@ func main() {
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
-	// create docker client
-	cli, err := client.NewClientWithOpts(client.FromEnv)
+	// Create a client for the Moby Engine API.
+	cli, err := client.New(client.FromEnv)
 	if err != nil {
 		panic(err)
 	}
@@ -55,8 +56,8 @@ func main() {
 		}
 	}(cli)
 
-	// check if docker is running
-	_, err = cli.Ping(context.Background())
+	// Check if the Moby API is reachable and negotiate a compatible API version.
+	_, err = cli.Ping(context.Background(), client.PingOptions{NegotiateAPIVersion: true})
 	if err != nil {
 		log.Fatalf("Docker error: %v", err)
 	}
@@ -65,23 +66,27 @@ func main() {
 	fch := make(chan error)
 	go refreshHostsfileJob(fch, cli)
 
-	// create listener for docker events
-	ch, ech := cli.Events(context.Background(), events.ListOptions{})
+	// Create listener for docker events.
+	eventResult := cli.Events(context.Background(), client.EventsListOptions{})
 
 	log.Println("everything seems okay, waiting for things to happen")
 	// wait for things to happen
 	for {
 		select {
-		case event := <-ch:
+		case event := <-eventResult.Messages:
 			switch event.Action {
 			case "start", "stop", "die", "destroy", "rename":
 				if conf.logEvents {
 					log.Println(event.Action, event.Actor.Attributes["name"])
 				}
-				refreshHostsfileNeeded = true
+				refreshHostsfileNeeded.Store(true)
 			}
-		case err := <-ech:
-			log.Println("Error updating hostsfile:", err)
+		case err, ok := <-eventResult.Err:
+			if !ok {
+				log.Println("Docker event stream closed")
+			} else {
+				log.Println("Error updating hostsfile:", err)
+			}
 			gracefulShutdown(1)
 		case err := <-fch:
 			log.Println("Docker event Error:", err)
@@ -97,8 +102,7 @@ func main() {
 // refreshHostsfileJob is a background job for refreshing the hosts file
 func refreshHostsfileJob(ech chan<- error, cli *client.Client) {
 	for {
-		if refreshHostsfileNeeded {
-			refreshHostsfileNeeded = false
+		if refreshHostsfileNeeded.CompareAndSwap(true, false) {
 			if conf.logEvents {
 				log.Println("writing hosts file")
 			}

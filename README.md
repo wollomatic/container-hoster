@@ -1,10 +1,12 @@
 # container-hoster
-A simple "etc/hosts" file injection tool to resolve names of local Docker containers on the host. It is inspired by [docker-hoster](https://github.com/dvddarias/docker-hoster) by [David Darias](https://github.com/dvddarias).
+A simple `/etc/hosts` file injection tool to resolve names of local Moby containers on the host. It uses the Moby Engine API and remains compatible with Docker Engine. It is inspired by [docker-hoster](https://github.com/dvddarias/docker-hoster) by [David Darias](https://github.com/dvddarias).
 
 
 ## Installation
 
-The docker image is available on [Docker Hub](https://hub.docker.com/r/wollomatic/container-hoster/). A sample [docker-compose.yml](https://raw.githubusercontent.com/wollomatic/container-hoster/main/compose.yaml) file is provided in the [repository](https://github.com/wollomatic/container-hoster).
+The container image is available on [Docker Hub](https://hub.docker.com/r/wollomatic/container-hoster/). A sample [compose.yaml](https://raw.githubusercontent.com/wollomatic/container-hoster/main/compose.yaml) file is provided in the [repository](https://github.com/wollomatic/container-hoster).
+
+By default, the Moby client connects to `/var/run/docker.sock`. A different Moby-compatible API endpoint can be selected with the standard `DOCKER_HOST`, `DOCKER_TLS_VERIFY`, and `DOCKER_CERT_PATH` environment variables.
 
 ## Configuration
 Container hoster is configured via environment variables. If no env variable is set, container-hoster will use the default value. The following variables are available:
@@ -17,26 +19,26 @@ Container hoster is configured via environment variables. If no env variable is 
 
 * ``CH_HOSTNAME_FROM_LABEL``: If set to true, the value given in container label ``de.wollomatic.container-hoster.name`` will be used as hostname. Defaults to ``false``.
 
-* ``CH_ONLY_LABELED_CONTAINERS``: If set to true, only containers with the label ``de.wollomatic.container-hoster.enable=true`` will be added to the hosts file, and all other containers are ignored. Defaults to ``false``, so every container is added to the hosts file.
+* ``CH_ONLY_LABELED_CONTAINERS``: If set to true, only containers with the label ``de.wollomatic.container-hoster.enabled=true`` will be added to the hosts file, and all other containers are ignored. Defaults to ``false``, so every container is added to the hosts file.
 
 * ``CH_NETWORK_REGEXP``: A regular expression to match the network name of the container. Only containers with a matching network name will be added to the hosts file. Defaults to ``.*``.
 
-* ``CH_LOG_EVENTS``: If set to true, all docker events which lead to rewrite the hosts file will be logged to stdout. Defaults to ``false``
+* ``CH_LOG_EVENTS``: If set to true, all docker events which lead to rewriting the hosts file will be logged to stdout. Defaults to ``false``.
 
 ## Container labels
 Container labels are optional. The following labels are available:
 
 * ``de.wollomatic.container-hoster.name``: The hostname to be used for the container if ``CH_HOSTNAME_FROM_LABEL`` is set to ``true``.
 
-* ``de.wollomatic.container-hoster.enable``: If set to ``true``, the container will be added to the hosts file. Defaults to ``true``.
+* ``de.wollomatic.container-hoster.enabled``: If set to ``true``, the container will be added to the hosts file.
 
 * ``de.wollomatic.container-hoster.exclude``: If set to ``true``, the container will be excluded from the hosts file.
 
 ## Security
 
-In most cases, the container-hoster container will be run as root. This is necessary to be able to write to the hosts file and connect to the docker socket. Giving access to the docker socket is potentially dangerous because a container that has full access to the docker socket could start and stop containers. Container-hoster will only listen to docker events and will not start or stop containers. It will only update the hosts file if a container is started or stopped.
+In most cases, the container-hoster container will be run as root. This is necessary to write to the hosts file and connect to the Moby API socket. Giving a container access to the API socket is potentially dangerous because that access can usually control the engine. Container-hoster only lists containers and listens to engine events; it does not start or stop containers. It updates the hosts file when relevant container events occur.
 
-The build container image is made from scratch and contains no additional software (except the Docker SDK and its dependencies).
+The runtime container image is made from scratch and contains no additional software beyond the application and its Moby client (ex. Docker SDK) dependencies.
 
 Container-hoster does not need to have access to any network.
 
