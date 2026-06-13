@@ -9,18 +9,18 @@ import (
 )
 
 const (
-	HOSTLIST_PREFIX = "\n#-----BEGIN CONTAINER-HOSTER GENERATED CONTENT-----\n"
-	HOSTLIST_INFO   = "# Please do not manually change this file while Container-Hoster ist running.\n#\n"
-	HOSTLIST_SUFFIX = "#\n#-----END CONTAINER-HOSTER GENERATED CONTENT-----\n# Every content below this line will be deleted.\n"
-	DOCKER_LABEL    = "de.wollomatic.container-hoster"
+	HOSTLIST_PREFIX        = "\n#-----BEGIN CONTAINER-HOSTER GENERATED CONTENT-----\n"
+	HOSTLIST_INFO          = "# Please do not manually change this file while Container-Hoster ist running.\n#\n"
+	HOSTLIST_SUFFIX        = "#\n#-----END CONTAINER-HOSTER GENERATED CONTENT-----\n# Every content below this line will be deleted.\n"
+	CONTAINER_LABEL_PREFIX = "de.wollomatic.container-hoster"
 )
 
 type config struct {
 	refreshHostsfileInterval  time.Duration // Interval to check if the hosts file needs to be refreshed
 	hostsfile                 string        // Path to the hosts file
 	hostnameFromContainername bool          // if true, the container name will be used as hostname
-	hostnameFromLabel         bool          // if true, the hostname will be taken from the label as defined in DOCKER_LABEL
-	onlyLabeledContainers     bool          // if true, only containers with the label as defined in DOCKER_LABEL will be added to the hosts file
+	hostnameFromLabel         bool          // if true, the hostname will be taken from the configured container label
+	onlyLabeledContainers     bool          // if true, only containers with the configured label will be added to the hosts file
 	logEvents                 bool          // if true, log docker events which cause a refresh of the hosts file
 	networkRegexp             string        // if set, only containers with a network matching this regexp will be added to the hosts file
 }
@@ -109,7 +109,7 @@ func (c *config) getFromENV() {
 	}
 }
 
-func (c *config)logConfig() {
+func (c *config) logConfig() {
 	log.Printf("Configuration:")
 	log.Printf("   hostsfile: %s", c.hostsfile)
 	log.Printf("   refreshHostsfileInterval: %s", c.refreshHostsfileInterval)
