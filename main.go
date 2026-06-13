@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"regexp"
 	"runtime"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -19,12 +20,13 @@ const (
 )
 
 var (
-	refreshHostsfileNeeded = true
+	refreshHostsfileNeeded atomic.Bool
 	networkRegexpCompiled  *regexp.Regexp
 	version                = "develop" // will be set in Github Action
 )
 
 func main() {
+	refreshHostsfileNeeded.Store(true)
 
 	log.Printf("--- Starting %s %s (%s, %s, %s) %s ---\n", programName, version, runtime.GOOS, runtime.GOARCH, runtime.Version(), programURL)
 
@@ -77,7 +79,7 @@ func main() {
 				if conf.logEvents {
 					log.Println(event.Action, event.Actor.Attributes["name"])
 				}
-				refreshHostsfileNeeded = true
+				refreshHostsfileNeeded.Store(true)
 			}
 		case err := <-eventResult.Err:
 			log.Println("Error updating hostsfile:", err)
@@ -96,8 +98,7 @@ func main() {
 // refreshHostsfileJob is a background job for refreshing the hosts file
 func refreshHostsfileJob(ech chan<- error, cli *client.Client) {
 	for {
-		if refreshHostsfileNeeded {
-			refreshHostsfileNeeded = false
+		if refreshHostsfileNeeded.CompareAndSwap(true, false) {
 			if conf.logEvents {
 				log.Println("writing hosts file")
 			}
