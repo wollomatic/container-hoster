@@ -81,8 +81,12 @@ func main() {
 				}
 				refreshHostsfileNeeded.Store(true)
 			}
-		case err := <-eventResult.Err:
-			log.Println("Error updating hostsfile:", err)
+		case err, ok := <-eventResult.Err:
+			if !ok {
+				log.Println("Docker event stream closed")
+			} else {
+				log.Println("Error updating hostsfile:", err)
+			}
 			gracefulShutdown(1)
 		case err := <-fch:
 			log.Println("Docker event Error:", err)
