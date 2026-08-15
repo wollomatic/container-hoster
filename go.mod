@@ -4,7 +4,7 @@ go 1.26
 
 require (
 	github.com/moby/moby/api v1.55.0
-	github.com/moby/moby/client v0.4.1
+	github.com/moby/moby/client v0.5.1
 )
 
 require (
