@@ -3,8 +3,8 @@ module github.com/wollomatic/container-hoster
 go 1.26.6
 
 require (
-	github.com/moby/moby/api v1.55.0
-	github.com/moby/moby/client v0.5.1
+	github.com/moby/moby/api v1.56.1
+	github.com/moby/moby/client v0.6.1
 )
 
 require (
