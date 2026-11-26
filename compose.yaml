@@ -1,7 +1,7 @@
 ---
 services:
   container-hoster:
-    image: wollomatic/container-hoster:0.1.1
+    image: wollomatic/container-hoster:0.1.3
     container_name: container-hoster
     read_only: true
     mem_limit: 100M
@@ -10,14 +10,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /etc/hosts:/hosts
     network_mode: none
-    # environment:
-    #   - CH_HOSTSFILE=./hosts
-    #   - CH_INTERVAL=10s
-    #   - CH_HOSTNAME_FROM_CONTAINERNAME=true
-    #   - CH_HOSTNAME_FROM_LABEL=false
-    #   - CH_ONLY_LABELED_CONTAINERS=true
-    #   - CH_NETWORK_REGEXP=.*
-    #   - CH_LOG_EVENTS=false
-    # labels:
-    #   de.wollomatic.container-hoster.name: "my-container"
-    #   de.wollomatic.container-hoster.enabled: "true"
+   # environment:
+   #   - CH_HOSTSFILE=./hosts
+   #   - CH_INTERVAL=10s
+   #   - CH_HOSTNAME_FROM_CONTAINERNAME=true
+   #   - CH_HOSTNAME_FROM_LABEL=false
+   #   - CH_ONLY_LABELED_CONTAINERS=true
+   #   - CH_NETWORK_REGEXP=.*
+   #   - CH_LOG_EVENTS=false
+   # labels:
+   #   de.wollomatic.container-hoster.name: "my-container"
+   #   de.wollomatic.container-hoster.enabled: "true"
